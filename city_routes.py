@@ -1,189 +1,127 @@
 
+
 import heapq
-import gzip
-import os
-from collections import Counter
+from collections import deque
+
+class CityMap:
+    def __init__(self):
+        self.graph = {}
+
+    def add_road(self, place1, place2, distance):
+        self.graph.setdefault(place1, [])
+        self.graph.setdefault(place2, [])
+        self.graph[place1].append((place2, distance))
+        self.graph[place2].append((place1, distance))
+
+    def display_map(self):
+        print("\n--- City Map ---")
+        for place, roads in self.graph.items():
+            print(place, "->", roads)
+
+    # Dijkstra's shortest path algorithm
+    def shortest_path(self, start, destination):
+        if start not in self.graph or destination not in self.graph:
+            print("Location not found.")
+            return
+
+        distances = {place: float("inf") for place in self.graph}
+        previous = {}
+        distances[start] = 0
+        queue = [(0, start)]
+
+        while queue:
+            distance, current = heapq.heappop(queue)
+
+            if distance > distances[current]:
+                continue
+
+            if current == destination:
+                break
+
+            for neighbor, weight in self.graph[current]:
+                new_distance = distance + weight
+
+                if new_distance < distances[neighbor]:
+                    distances[neighbor] = new_distance
+                    previous[neighbor] = current
+                    heapq.heappush(queue, (new_distance, neighbor))
+
+        if distances[destination] == float("inf"):
+            print("No route available.")
+            return
+
+        path = []
+        current = destination
+
+        while current != start:
+            path.append(current)
+            current = previous[current]
+
+        path.append(start)
+        path.reverse()
+
+        print("Shortest route:", " -> ".join(path))
+        print("Total distance:", distances[destination], "km")
+
+    # Breadth-First Search
+    def bfs(self, start):
+        if start not in self.graph:
+            print("Location not found.")
+            return
+
+        visited = {start}
+        queue = deque([start])
+
+        print("BFS traversal:")
+
+        while queue:
+            current = queue.popleft()
+            print(current, end=" ")
+
+            for neighbor, _ in self.graph[current]:
+                if neighbor not in visited:
+                    visited.add(neighbor)
+                    queue.append(neighbor)
+
+        print()
 
 
-# Node for Huffman Tree
-class Node:
-    def __init__(self, char, frequency):
-        self.char = char
-        self.frequency = frequency
-        self.left = None
-        self.right = None
+# Create a sample city map
+city = CityMap()
 
+city.add_road("Home", "Market", 4)
+city.add_road("Home", "College", 6)
+city.add_road("Market", "Hospital", 3)
+city.add_road("Market", "College", 2)
+city.add_road("College", "Hospital", 5)
+city.add_road("Hospital", "Airport", 8)
+city.add_road("College", "Airport", 10)
 
-# Build Huffman Tree
-def build_huffman_tree(text):
-    if not text:
-        return None
-
-    frequency = Counter(text)
-    heap = []
-    counter = 0
-
-    for char, freq in frequency.items():
-        node = Node(char, freq)
-        heapq.heappush(heap, (freq, counter, node))
-        counter += 1
-
-    while len(heap) > 1:
-        freq1, _, left = heapq.heappop(heap)
-        freq2, _, right = heapq.heappop(heap)
-
-        parent = Node(None, freq1 + freq2)
-        parent.left = left
-        parent.right = right
-
-        heapq.heappush(
-            heap, (parent.frequency, counter, parent)
-        )
-        counter += 1
-
-    return heap[0][2]
-
-
-# Generate Huffman Codes
-def generate_codes(root, prefix="", codes=None):
-    if codes is None:
-        codes = {}
-
-    if root is None:
-        return codes
-
-    if root.char is not None:
-        codes[root.char] = prefix or "0"
-        return codes
-
-    generate_codes(root.left, prefix + "0", codes)
-    generate_codes(root.right, prefix + "1", codes)
-
-    return codes
-
-
-# Demonstrate Huffman Encoding and Decoding
-def huffman_demo():
-    text = input("Enter text to encode: ")
-
-    if not text:
-        print("Text cannot be empty.")
-        return
-
-    root = build_huffman_tree(text)
-    codes = generate_codes(root)
-
-    encoded = "".join(codes[char] for char in text)
-
-    print("\nCharacter Frequencies:")
-    for char, freq in Counter(text).items():
-        print(repr(char), ":", freq)
-
-    print("\nHuffman Codes:")
-    for char, code in codes.items():
-        print(repr(char), ":", code)
-
-    print("\nEncoded Binary String:")
-    print(encoded)
-
-    # Decode the encoded bit string
-    decoded = ""
-    current = root
-
-    for bit in encoded:
-        if bit == "0":
-            current = current.left
-        else:
-            current = current.right
-
-        if current.char is not None:
-            decoded += current.char
-            current = root
-
-    print("\nDecoded Text:")
-    print(decoded)
-
-
-# Compress a file using GZIP
-def compress_file():
-    source = input("Enter file path to compress: ").strip()
-
-    if not os.path.isfile(source):
-        print("File not found.")
-        return
-
-    destination = source + ".gz"
-
-    try:
-        with open(source, "rb") as file:
-            data = file.read()
-
-        with gzip.open(destination, "wb") as gz_file:
-            gz_file.write(data)
-
-        print("File compressed successfully!")
-        print("Compressed file:", destination)
-        print("Original size:", len(data), "bytes")
-        print("Compressed size:", os.path.getsize(destination), "bytes")
-
-    except OSError as error:
-        print("Compression failed:", error)
-
-
-# Decompress a GZIP file
-def decompress_file():
-    source = input("Enter .gz file path: ").strip()
-
-    if not os.path.isfile(source):
-        print("File not found.")
-        return
-
-    if not source.endswith(".gz"):
-        print("Please provide a .gz file.")
-        return
-
-    destination = source[:-3]
-
-    if os.path.exists(destination):
-        print("Output file already exists. Choose another name.")
-        return
-
-    try:
-        with gzip.open(source, "rb") as gz_file:
-            data = gz_file.read()
-
-        with open(destination, "wb") as file:
-            file.write(data)
-
-        print("File decompressed successfully!")
-        print("Restored file:", destination)
-
-    except (OSError, EOFError) as error:
-        print("Decompression failed:", error)
-
-
-# Main menu
+# Menu-driven application
 while True:
-    print("\n===== File Compression System =====")
-    print("1. Huffman Encoding and Decoding")
-    print("2. Compress File using GZIP")
-    print("3. Decompress GZIP File")
+    print("\n--- GPS Navigation System ---")
+    print("1. Display City Map")
+    print("2. Find Shortest Route")
+    print("3. BFS Traversal")
     print("4. Exit")
 
     choice = input("Enter your choice: ")
 
     if choice == "1":
-        huffman_demo()
+        city.display_map()
 
     elif choice == "2":
-        compress_file()
+        start = input("Enter starting location: ").strip()
+        destination = input("Enter destination: ").strip()
+        city.shortest_path(start, destination)
 
     elif choice == "3":
-        decompress_file()
+        start = input("Enter starting location: ").strip()
+        city.bfs(start)
 
     elif choice == "4":
-        print("Thank you for using the system!")
+        print("Thank you for using GPS Navigation!")
         break
 
     else:
-        print("Invalid choice. Please try again.")
+        print("Invalid choice. Try again.")
