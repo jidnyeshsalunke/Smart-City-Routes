@@ -1,61 +1,45 @@
 # Smart-City-Routes
 This program uses a weighted graph and Dijkstra's algorithm to find the shortest path between two locations in a sample city.
 
-# Huffman File Compression Using Python
+# Smart City Navigation System Using Weighted Graphs
 
 ## Description
-This project demonstrates frequency-based data encoding
-using the Huffman Tree and file compression using GZIP.
+This project implements a basic GPS navigation system
+using a weighted graph in Python. Locations are
+represented as vertices, and roads are represented as
+weighted edges, where weights indicate distances in km.
 
-Huffman coding assigns variable-length binary codes
-to characters based on their frequency. Frequently
-occurring characters generally receive shorter codes,
-while less frequent characters receive longer codes.
-
-The application also uses Python's gzip module to
-compress and decompress files.
+Dijkstra's algorithm calculates the shortest route
+between two locations. Breadth-First Search (BFS)
+traverses the locations connected to a starting point.
 
 ## Objectives
-- Understand Huffman Trees and frequency-based encoding.
-- Implement a priority queue using a min-heap.
-- Generate Huffman codes for characters.
-- Encode and decode text.
-- Compress and decompress files using GZIP.
+- Understand graph representation using adjacency lists.
+- Implement weighted graphs.
+- Find shortest paths using Dijkstra's algorithm.
+- Traverse graphs using BFS.
+- Apply graph algorithms to a navigation problem.
 
-## Features
-- Calculate character frequencies.
-- Construct a Huffman Tree.
-- Generate binary codes.
-- Encode and decode text.
-- Compress files into .gz format.
-- Restore files through decompression.
-
-## Technologies Used
+## Technologies
 - Python 3
-- Heap / Priority Queue
-- Huffman Tree
-- gzip module
-- Counter from collections
+- Graphs and adjacency lists
+- Dijkstra's algorithm
+- Breadth-First Search (BFS)
 
 ## How to Run
 1. Install Python 3.
-2. Save the code as huffman_compression.py.
-3. Open the terminal in the project folder.
-4. Execute:
-
-   python huffman_compression.py
-
-5. Select an operation from the menu.
+2. Save the code as city_navigation.py.
+3. Open a terminal in the project folder.
+4. Run: python city_navigation.py
+5. Select an option from the menu.
 
 ## Applications
-- Data compression
-- File storage optimization
-- Data transmission
-- Text encoding
-- Compression utilities
+- GPS navigation systems
+- Road network planning
+- Route optimization
+- City transportation systems
 
 ## Conclusion
-This project demonstrates how Huffman Trees can
-encode text using character frequencies and how GZIP
-can compress and restore files. It provides practical
-understanding of trees, heaps, encoding, and compression.
+This project demonstrates how weighted graphs and
+graph algorithms can be used to represent road networks
+and calculate shortest routes between locations.
